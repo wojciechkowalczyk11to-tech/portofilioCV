@@ -7,18 +7,18 @@ import About from '@/components/About';
 import Experience from '@/components/Experience';
 import Skills from '@/components/Skills';
 import Projects from '@/components/Projects';
+import Achievements from '@/components/Achievements';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Design Philosophy: Modern Minimalist with Fluid Motion
- * - Clean white background with deep charcoal text
- * - Teal accent color (#14b8a6) appearing through animations
- * - Typography-driven hierarchy with Playfair Display for titles
- * - Smooth GSAP animations guiding user attention
- * - Scroll-triggered reveals and parallax effects
+ * Design Philosophy: Modern Minimalist with Fluid Motion + Enhanced Interactivity
+ * - Extensive scroll-triggered animations
+ * - Parallax effects and floating elements
+ * - Rich interactive elements that respond to scroll
+ * - Vibrant animations that make the portfolio feel alive
  */
 
 export default function Home() {
@@ -50,6 +50,20 @@ export default function Home() {
       );
     });
 
+    // Add parallax effect to background elements
+    const parallaxElements = containerRef.current.querySelectorAll('[data-parallax]');
+    parallaxElements.forEach((element: Element) => {
+      gsap.to(element, {
+        y: (i) => i * 100,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: element,
+          scrub: 1,
+          markers: false,
+        },
+      });
+    });
+
     // Cleanup
     return () => {
       ScrollTrigger.getAll().forEach((trigger: any) => trigger.kill());
@@ -57,13 +71,14 @@ export default function Home() {
   }, []);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-background text-foreground">
+    <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Navigation />
       <main>
         <Hero />
         <About />
         <Experience />
         <Skills />
+        <Achievements />
         <Projects />
         <Contact />
       </main>
