@@ -1,164 +1,302 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Design Philosophy: Modern Minimalist with Fluid Motion + Enhanced Interactivity
- * - Animated timeline with staggered reveals
- * - Interactive experience cards with hover effects
- * - Animated connecting line
- * - Rich scroll interactions
+ * Dark Glassmorphism Experience Section
+ * - Visual timeline with glow dots
+ * - Glassmorphic experience cards
+ * - Scroll-triggered stagger
  */
+
+const experiences = [
+  {
+    title: 'AI Systems Developer',
+    company: 'Self-employed',
+    period: 'Grudzień 2025 — obecnie',
+    location: 'Łódź, Polska',
+    color: '#7c3aed',
+    icon: '🧠',
+    highlights: [
+      'N.O.C: backend z 8 LLM, RAG (pgvector), multi-agent runtime na GCP Cloud Run',
+      'NEXUS MCP Server: 44-narzędziowy serwer MCP, live 24/7 via Cloudflare Tunnel',
+      'Gangus AI: komercyjny orkiestrator LLM ($49), 90% redukcja kosztów',
+      'GigaGrok Bot: multimodal Telegram bot z 776-doc vector KB',
+    ],
+    tags: ['FastAPI', 'LLM', 'RAG', 'GCP', 'MCP Protocol', 'Docker'],
+  },
+  {
+    title: 'Doradca Klienta',
+    company: 'Orange Polska',
+    period: 'Listopad 2021 — Czerwiec 2022',
+    location: 'Łódź, Polska',
+    color: '#f59e0b',
+    icon: '📞',
+    highlights: [
+      'Obsługa klientów w zakresie usług telekomunikacyjnych',
+      'Rozwiązywanie problemów technicznych i sprzedaż produktów',
+      'Praca w środowisku wymagającym precyzji i komunikatywności',
+    ],
+    tags: ['Obsługa klienta', 'Sprzedaż', 'Komunikacja'],
+  },
+  {
+    title: 'Magazynier',
+    company: 'TERG SA (Media Expert)',
+    period: 'Czerwiec 2020 — Kwiecień 2021',
+    location: 'Łódź, Polska',
+    color: '#06b6d4',
+    icon: '📦',
+    highlights: [
+      'Zarządzanie magazynem elektroniki użytkowej',
+      'Przyjmowanie i wydawanie towarów, inwentaryzacja',
+      'Praca w dynamicznym środowisku logistycznym',
+    ],
+    tags: ['Logistyka', 'Magazyn', 'Organizacja'],
+  },
+];
+
+const education = [
+  {
+    title: 'Samokształcenie: AI/ML, Cloud Architecture',
+    institution: 'Online (Udemy, YouTube, Dokumentacje)',
+    period: '2024 — obecnie',
+    color: '#7c3aed',
+    icon: '🎓',
+    desc: 'Python, FastAPI, LLM APIs, GCP, Docker, pgvector, MCP Protocol — praktyczna nauka przez budowanie projektów produkcyjnych.',
+  },
+  {
+    title: 'Matura',
+    institution: 'XXIV LO im. M. Curie-Skłodowskiej, Łódź',
+    period: '2017 — 2018',
+    color: '#10b981',
+    icon: '🏫',
+    desc: 'Profil matematyczno-fizyczny.',
+  },
+];
 
 export default function Experience() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    // Animate timeline line
-    if (timelineRef.current) {
-      gsap.fromTo(
-        timelineRef.current,
-        { scaleY: 0, transformOrigin: 'top' },
-        {
-          scaleY: 1,
-          duration: 1.5,
-          ease: 'cubic.out',
-          scrollTrigger: {
-            trigger: timelineRef.current,
-            start: 'top 70%',
-          },
-        }
-      );
-    }
-
-    const items = sectionRef.current.querySelectorAll('[data-experience-item]');
-    items.forEach((item, index) => {
-      // Stagger the items
+    const items = sectionRef.current.querySelectorAll('[data-exp-item]');
+    items.forEach((item, i) => {
       gsap.fromTo(
         item,
-        { opacity: 0, x: index % 2 === 0 ? -40 : 40, y: 20 },
+        { opacity: 0, x: -30 },
         {
           opacity: 1,
           x: 0,
-          y: 0,
           duration: 0.7,
-          delay: index * 0.15,
-          ease: 'cubic.out',
-          scrollTrigger: {
-            trigger: item,
-            start: 'top 80%',
-          },
+          delay: i * 0.12,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: item, start: 'top 85%' },
         }
       );
-
-      // Hover animation
-      item.addEventListener('mouseenter', () => {
-        gsap.to(item, {
-          y: -8,
-          boxShadow: '0 20px 40px rgba(20, 184, 166, 0.15)',
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-      });
-
-      item.addEventListener('mouseleave', () => {
-        gsap.to(item, {
-          y: 0,
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-      });
     });
   }, []);
-
-  const experiences = [
-    {
-      title: 'Human Resource Development Head',
-      company: 'HIMPRENEUR',
-      period: 'Nov 2024 - Nov 2025',
-      description: 'Led and mentored the HR team in resolving complex interpersonal conflicts and mediating disputes. Implemented a structured recruitment method that achieved a 60% improvement in candidate quality.',
-      highlights: ['Team Leadership', 'Conflict Resolution', 'Recruitment Strategy'],
-    },
-    {
-      title: 'Human Resource Development Deputy Manager',
-      company: 'Bina Nusantara Computer Club (BNCC)',
-      period: 'Oct 2024 - Oct 2025',
-      description: 'Developed training programs that enhanced members\' technical and soft skills, resulting in a 40% improvement in performance evaluations. Led strategic HR initiatives supporting organizational growth.',
-      highlights: ['Training Development', 'Strategic Planning', 'Performance Management'],
-    },
-    {
-      title: 'Freshmen Partner (FP)',
-      company: 'Bina Nusantara University First Year Program',
-      period: 'Sep 2024 - Sep 2025',
-      description: 'Led a group of freshmen in executing impactful community service projects. Mentored 7+ freshmen throughout the academic year, supporting their academic, personal, and leadership growth.',
-      highlights: ['Mentorship', 'Community Service', 'Leadership Development'],
-    },
-    {
-      title: 'Student Council President',
-      company: 'SMAK St Bonaventura Senior Highschool',
-      period: 'Nov 2021 - Oct 2022',
-      description: 'Created 15+ events that became valued parts of school culture. Organized successful campaigns to raise money for charitable causes and maintained strong school presence.',
-      highlights: ['Event Management', 'Fundraising', 'Leadership'],
-    },
-  ];
 
   return (
     <section
       id="experience"
       ref={sectionRef}
-      className="py-20 md:py-32 bg-secondary/30 relative overflow-hidden"
-      data-animate
+      className="py-24 relative overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #0d0d1a 100%)' }}
     >
-      {/* Animated background elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Background glow */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: '30%',
+          right: '-5%',
+          width: '400px',
+          height: '400px',
+          background: 'radial-gradient(circle, rgba(245, 158, 11, 0.06) 0%, transparent 70%)',
+          borderRadius: '50%',
+        }}
+      />
 
-      <div className="container max-w-4xl relative z-10">
-        <h2 className="section-title mb-16">
-          <span className="animated-underline">Experience</span>
-        </h2>
+      <div className="container max-w-4xl relative" style={{ zIndex: 1 }}>
+        <div className="section-label">Doświadczenie</div>
+        <h2 className="section-title">Historia zawodowa</h2>
 
-        <div className="relative">
-          {/* Animated timeline line */}
-          <div
-            ref={timelineRef}
-            className="absolute left-0 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-accent via-accent to-accent/30 md:transform md:-translate-x-1/2"
-          ></div>
+        {/* Experience Timeline */}
+        <div className="relative mb-16">
+          {/* Timeline line */}
+          <div className="timeline-line" />
 
-          <div className="space-y-12 md:space-y-16">
-            {experiences.map((exp, index) => (
-              <div
-                key={index}
-                data-experience-item
-                className={`md:flex md:gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-              >
+          <div className="space-y-8 pl-14">
+            {experiences.map((exp, i) => (
+              <div key={i} data-exp-item className="relative">
                 {/* Timeline dot */}
-                <div className="hidden md:flex md:w-1/2 md:justify-center">
-                  <div className="absolute left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full bg-accent border-4 border-background shadow-lg"></div>
-                </div>
+                <div
+                  className="timeline-dot"
+                  style={{ background: exp.color, boxShadow: `0 0 12px ${exp.color}80` }}
+                />
 
-                {/* Content */}
-                <div className={`md:w-1/2 pl-8 md:pl-0 ${index % 2 === 0 ? 'md:pr-8' : 'md:pl-8'}`}>
-                  <div className="p-6 bg-background rounded-lg border border-border hover:border-accent transition-all duration-300 cursor-pointer">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">{exp.title}</h3>
-                    <p className="text-accent font-medium text-sm mb-1">{exp.company}</p>
-                    <p className="text-muted-foreground text-sm mb-4">{exp.period}</p>
-                    <p className="text-foreground text-base leading-relaxed font-light mb-4">
-                      {exp.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {exp.highlights.map((highlight, hIndex) => (
-                        <span
-                          key={hIndex}
-                          className="text-xs px-3 py-1 bg-accent/10 text-accent rounded-full font-medium"
+                <div
+                  className="glass-card p-6"
+                  style={{ borderColor: `${exp.color}22` }}
+                >
+                  {/* Header */}
+                  <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{exp.icon}</span>
+                      <div>
+                        <h3
+                          style={{
+                            fontFamily: 'Montserrat, sans-serif',
+                            fontWeight: 700,
+                            fontSize: '17px',
+                            color: '#f0f0ff',
+                            marginBottom: '2px',
+                          }}
                         >
-                          {highlight}
+                          {exp.title}
+                        </h3>
+                        <span
+                          style={{
+                            fontFamily: 'Poppins, sans-serif',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            color: exp.color,
+                          }}
+                        >
+                          {exp.company}
                         </span>
-                      ))}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div
+                        style={{
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '12px',
+                          color: '#64748b',
+                          marginBottom: '2px',
+                        }}
+                      >
+                        {exp.period}
+                      </div>
+                      <div
+                        style={{
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '11px',
+                          color: '#475569',
+                        }}
+                      >
+                        📍 {exp.location}
+                      </div>
                     </div>
                   </div>
+
+                  {/* Highlights */}
+                  <ul className="space-y-2 mb-4">
+                    {exp.highlights.map((h, hi) => (
+                      <li
+                        key={hi}
+                        className="flex gap-2 items-start"
+                        style={{
+                          fontFamily: 'Poppins, sans-serif',
+                          fontSize: '13px',
+                          color: '#94a3b8',
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        <span style={{ color: exp.color, flexShrink: 0, marginTop: '2px' }}>→</span>
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {exp.tags.map((tag, ti) => (
+                      <span
+                        key={ti}
+                        style={{
+                          padding: '3px 10px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          fontFamily: 'Poppins, sans-serif',
+                          background: `${exp.color}15`,
+                          color: exp.color,
+                          border: `1px solid ${exp.color}25`,
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Education */}
+        <div>
+          <div className="section-label" style={{ marginBottom: '16px' }}>Edukacja</div>
+          <div className="space-y-4">
+            {education.map((edu, i) => (
+              <div
+                key={i}
+                data-exp-item
+                className="glass-card p-5 flex gap-4 items-start"
+                style={{ borderColor: `${edu.color}22` }}
+              >
+                <div
+                  className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                  style={{ background: `${edu.color}18`, border: `1px solid ${edu.color}30` }}
+                >
+                  {edu.icon}
+                </div>
+                <div className="flex-1">
+                  <div className="flex flex-wrap justify-between gap-2 mb-1">
+                    <h3
+                      style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontWeight: 700,
+                        fontSize: '14px',
+                        color: '#e2e8f0',
+                      }}
+                    >
+                      {edu.title}
+                    </h3>
+                    <span
+                      style={{
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '11px',
+                        color: '#64748b',
+                      }}
+                    >
+                      {edu.period}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '12px',
+                      color: edu.color,
+                      fontWeight: 600,
+                      marginBottom: '6px',
+                    }}
+                  >
+                    {edu.institution}
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '12px',
+                      color: '#64748b',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {edu.desc}
+                  </p>
                 </div>
               </div>
             ))}

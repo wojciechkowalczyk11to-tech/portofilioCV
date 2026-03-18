@@ -1,163 +1,47 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-/**
- * Design Philosophy: Modern Minimalist with Fluid Motion + Enhanced Interactivity
- * - Animated achievement cards with staggered reveals
- * - Rotating medal icons
- * - Hover effects with scale and shadow
- * - Scroll-triggered animations
- */
+gsap.registerPlugin(ScrollTrigger);
+
+const achievements = [
+  { icon: '🏆', title: '8 Dostawców LLM', desc: 'N.O.C obsługuje OpenAI, Anthropic, xAI/Grok, Gemini, DeepSeek, Groq, Mistral, OpenRouter z inteligentnym routingiem ECO/SMART/DEEP.', color: '#7c3aed' },
+  { icon: '🔧', title: '44 Narzędzia MCP', desc: 'Własny serwer MCP Protocol z 44 narzędziami — jedyny taki projekt open-source w Polsce. Live 24/7 via Cloudflare Tunnel.', color: '#06b6d4' },
+  { icon: '📚', title: '776 Dokumentów Vector KB', desc: 'GigaGrok Bot z xAI Collections — 776-dokumentowa baza wiedzy w formacie wektorowym dla semantic search.', color: '#f59e0b' },
+  { icon: '💰', title: '90% Redukcja Kosztów LLM', desc: 'Gangus AI — komercyjny orkiestrator ($49) z cost optimizer i evaluator layer. Realna redukcja kosztów o 90%.', color: '#10b981' },
+  { icon: '☁️', title: 'GCP Cloud Run Production', desc: 'Wszystkie projekty wdrożone na GCP Cloud Run z Cloudflare Tunnel — zero downtime, auto-scaling.', color: '#ef4444' },
+  { icon: '🛡️', title: 'Zero Trust Security', desc: 'Cloudflare Zero Trust, RBAC, invite system, 2FA, Port Knocking — enterprise-grade security w projektach indie.', color: '#a78bfa' },
+];
 
 export default function Achievements() {
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!sectionRef.current) return;
-
     const cards = sectionRef.current.querySelectorAll('[data-achievement-card]');
-    cards.forEach((card, index) => {
-      gsap.fromTo(
-        card,
-        { opacity: 0, y: 40, rotateY: -90 },
-        {
-          opacity: 1,
-          y: 0,
-          rotateY: 0,
-          duration: 0.8,
-          delay: index * 0.1,
-          ease: 'back.out',
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 80%',
-          },
-        }
-      );
-
-      // Hover animation
-      card.addEventListener('mouseenter', () => {
-        gsap.to(card, {
-          y: -12,
-          boxShadow: '0 25px 50px rgba(20, 184, 166, 0.2)',
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-
-        // Rotate icon
-        const icon = card.querySelector('[data-achievement-icon]');
-        if (icon) {
-          gsap.to(icon, {
-            rotateZ: 360,
-            duration: 0.6,
-            ease: 'back.out',
-          });
-        }
-      });
-
-      card.addEventListener('mouseleave', () => {
-        gsap.to(card, {
-          y: 0,
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
+    cards.forEach((card, i) => {
+      gsap.fromTo(card, { opacity: 0, y: 40, scale: 0.95 }, {
+        opacity: 1, y: 0, scale: 1, duration: 0.6, delay: i * 0.08, ease: 'power3.out',
+        scrollTrigger: { trigger: card, start: 'top 88%' },
       });
     });
   }, []);
 
-  const achievements = [
-    {
-      title: '1st Place BMPC: Business Pitch Competition',
-      organization: 'Bina Nusantara University',
-      date: 'May 2024',
-      icon: '🏆',
-    },
-    {
-      title: '1st Place SCUBA International Business Plan Competition',
-      organization: 'Faculty of Economics and Business Brawijaya University',
-      date: 'Nov 2024',
-      icon: '🥇',
-    },
-    {
-      title: 'The Winner of Innovation Business Award',
-      organization: 'Inventify Center',
-      date: 'May 2025',
-      icon: '💡',
-    },
-    {
-      title: 'GOLD MEDAL International Youthpreneur Competition',
-      organization: 'Inventify Center',
-      date: 'May 2025',
-      icon: '🎖️',
-    },
-    {
-      title: 'Top 3 Best Social Ideation',
-      organization: 'Pikiran Terbaik Negeri (BUMN)',
-      date: 'Aug 2025',
-      icon: '⭐',
-    },
-  ];
-
   return (
-    <section
-      id="achievements"
-      ref={sectionRef}
-      className="py-20 md:py-32 bg-secondary/30 relative overflow-hidden"
-      data-animate
-    >
-      {/* Animated background elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="container max-w-5xl relative z-10">
-        <h2 className="section-title mb-12">
-          <span className="animated-underline">Achievements & Awards</span>
-        </h2>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {achievements.map((achievement, index) => (
-            <div
-              key={index}
-              data-achievement-card
-              className="p-6 bg-background rounded-lg border border-border hover:border-accent transition-all duration-300 cursor-pointer group"
-              style={{ perspective: '1000px' }}
-            >
-              <div className="flex items-start gap-4 mb-4">
-                <div
-                  data-achievement-icon
-                  className="text-4xl flex-shrink-0 group-hover:scale-110 transition-transform"
-                >
-                  {achievement.icon}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground text-sm leading-tight mb-2">
-                    {achievement.title}
-                  </h3>
-                  <p className="text-accent text-xs font-medium">{achievement.organization}</p>
-                </div>
-              </div>
-              <p className="text-muted-foreground text-xs">{achievement.date}</p>
+    <section id="achievements" ref={sectionRef} className="py-24 relative overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #0d0d1a 100%)' }}>
+      <div className="absolute pointer-events-none" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '700px', height: '700px', background: 'radial-gradient(circle, rgba(124, 58, 237, 0.05) 0%, transparent 70%)', borderRadius: '50%' }} />
+      <div className="container max-w-5xl relative" style={{ zIndex: 1 }}>
+        <div className="section-label">Osiągnięcia</div>
+        <h2 className="section-title">Kluczowe metryki</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {achievements.map((item, i) => (
+            <div key={i} data-achievement-card className="glass-card p-6" style={{ borderColor: `${item.color}22` }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4" style={{ background: `${item.color}18`, border: `1px solid ${item.color}30` }}>{item.icon}</div>
+              <h3 style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: '15px', color: item.color, marginBottom: '8px' }}>{item.title}</h3>
+              <p style={{ fontFamily: 'Poppins, sans-serif', fontSize: '12.5px', color: '#64748b', lineHeight: 1.7 }}>{item.desc}</p>
             </div>
           ))}
-        </div>
-
-        {/* Stats section */}
-        <div className="mt-16 pt-12 border-t border-border grid md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="text-5xl font-bold text-accent mb-2">5+</div>
-            <p className="text-foreground font-medium">Major Awards</p>
-            <p className="text-muted-foreground text-sm">Recognized for excellence</p>
-          </div>
-          <div className="text-center">
-            <div className="text-5xl font-bold text-accent mb-2">4+</div>
-            <p className="text-foreground font-medium">Leadership Roles</p>
-            <p className="text-muted-foreground text-sm">Proven track record</p>
-          </div>
-          <div className="text-center">
-            <div className="text-5xl font-bold text-accent mb-2">100%</div>
-            <p className="text-foreground font-medium">Commitment</p>
-            <p className="text-muted-foreground text-sm">To excellence</p>
-          </div>
         </div>
       </div>
     </section>

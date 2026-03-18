@@ -1,13 +1,52 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Design Philosophy: Modern Minimalist with Fluid Motion + Enhanced Interactivity
- * - Animated skill bars that fill on scroll
- * - Interactive skill cards with hover effects
- * - Staggered animations for visual interest
- * - Rotating skill badges
+ * Dark Glassmorphism Skills Section
+ * - Animated skill bars (fill on scroll)
+ * - Tech pill badges with hover glow
+ * - Categorized skill groups
  */
+
+const skillBars = [
+  { name: 'Python / FastAPI / asyncio', level: 92 },
+  { name: 'LLM Integration (8 providers)', level: 95 },
+  { name: 'RAG / pgvector / Embeddings', level: 88 },
+  { name: 'GCP (Cloud Run, Compute, SQL)', level: 85 },
+  { name: 'Docker / CI/CD / GitHub Actions', level: 87 },
+  { name: 'Cloudflare (Tunnel, Workers, Zero Trust)', level: 90 },
+];
+
+const skillGroups = [
+  {
+    label: 'Backend & AI',
+    color: 'pill-purple',
+    pills: ['Python 3.12', 'FastAPI', 'asyncio', 'Pydantic', 'SQLAlchemy', 'PostgreSQL', 'pgvector', 'Redis', 'Celery'],
+  },
+  {
+    label: 'Multi-LLM Orchestration',
+    color: 'pill-cyan',
+    pills: ['OpenAI / GPT-4', 'Anthropic / Claude', 'xAI / Grok', 'Gemini / Vertex AI', 'DeepSeek', 'Groq', 'Mistral', 'OpenRouter'],
+  },
+  {
+    label: 'Cloud & Infrastruktura',
+    color: 'pill-green',
+    pills: ['GCP Cloud Run', 'GCP Compute Engine', 'Cloud SQL', 'Cloudflare Workers', 'Cloudflare Tunnel', 'Cloudflare KV', 'R2', 'Zero Trust', 'Docker'],
+  },
+  {
+    label: 'DevOps & Tooling',
+    color: 'pill-gold',
+    pills: ['Git / GitHub', 'GitHub Actions', 'CI/CD', 'Bash / Linux', 'systemd', 'nginx', 'Termux / Android'],
+  },
+  {
+    label: 'Protokoły & Integracje',
+    color: 'pill-red',
+    pills: ['MCP Protocol', 'LangChain', 'LangGraph', 'aiogram', 'Telegram API', 'REST API', 'WebSockets'],
+  },
+];
 
 export default function Skills() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -16,157 +55,211 @@ export default function Skills() {
     if (!sectionRef.current) return;
 
     // Animate skill bars
-    const skillBars = sectionRef.current.querySelectorAll('[data-skill-bar]');
-    skillBars.forEach((bar, index) => {
+    const bars = sectionRef.current.querySelectorAll('[data-skill-bar]');
+    bars.forEach((bar, i) => {
+      const fill = bar.querySelector('.skill-bar-fill') as HTMLElement;
+      const level = bar.getAttribute('data-level') || '0';
+
       gsap.fromTo(
-        bar.querySelector('.skill-bar-fill'),
+        fill,
         { width: '0%' },
         {
-          width: bar.getAttribute('data-skill-level') || '0%',
-          duration: 1.5,
-          delay: index * 0.1,
-          ease: 'cubic.out',
-          scrollTrigger: {
-            trigger: bar,
-            start: 'top 80%',
-          },
+          width: `${level}%`,
+          duration: 1.4,
+          delay: i * 0.1,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: bar, start: 'top 85%' },
         }
       );
     });
 
-    // Animate tech badges with rotation
-    const badges = sectionRef.current.querySelectorAll('[data-tech-badge]');
-    badges.forEach((badge, index) => {
+    // Animate section items
+    const items = sectionRef.current.querySelectorAll('[data-animate-item]');
+    items.forEach((el, i) => {
       gsap.fromTo(
-        badge,
-        { opacity: 0, scale: 0.8, rotateZ: -180 },
+        el,
+        { opacity: 0, y: 30 },
         {
           opacity: 1,
-          scale: 1,
-          rotateZ: 0,
-          duration: 0.7,
-          delay: index * 0.05,
-          ease: 'back.out',
-          scrollTrigger: {
-            trigger: badge,
-            start: 'top 85%',
-          },
+          y: 0,
+          duration: 0.6,
+          delay: i * 0.08,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 88%' },
         }
       );
-
-      // Hover animation
-      badge.addEventListener('mouseenter', () => {
-        gsap.to(badge, {
-          scale: 1.1,
-          y: -5,
-          boxShadow: '0 10px 25px rgba(20, 184, 166, 0.2)',
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-      });
-
-      badge.addEventListener('mouseleave', () => {
-        gsap.to(badge, {
-          scale: 1,
-          y: 0,
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-      });
     });
   }, []);
-
-  const technicalSkills = [
-    { name: 'Leadership', level: '95%' },
-    { name: 'Problem Solving', level: '92%' },
-    { name: 'Time Management', level: '90%' },
-    { name: 'Delegation', level: '88%' },
-    { name: 'Team Work', level: '95%' },
-    { name: 'Adaptability', level: '92%' },
-  ];
-
-  const technologies = [
-    'Microsoft Office',
-    'Google Workspace',
-    'Figma',
-    'n8n',
-    'SQL',
-    'Python',
-    'Java',
-    'English (IELTS 8.0)',
-    'Bahasa Indonesia (Native)',
-  ];
 
   return (
     <section
       id="skills"
       ref={sectionRef}
-      className="py-20 md:py-32 bg-background relative overflow-hidden"
-      data-animate
+      className="py-24 relative overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a0f 100%)' }}
     >
-      {/* Animated background elements */}
-      <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -top-40 -left-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Background glow */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: '10%',
+          right: '-5%',
+          width: '450px',
+          height: '450px',
+          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.07) 0%, transparent 70%)',
+          borderRadius: '50%',
+        }}
+      />
 
-      <div className="container max-w-4xl relative z-10">
-        <h2 className="section-title mb-12">
-          <span className="animated-underline">Skills & Competencies</span>
-        </h2>
+      <div className="container max-w-5xl relative" style={{ zIndex: 1 }}>
+        <div data-animate-item className="section-label">Umiejętności</div>
+        <h2 data-animate-item className="section-title">Stack technologiczny</h2>
 
-        {/* Technical Skills with Progress Bars */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-semibold text-foreground mb-8">Core Competencies</h3>
-          <div className="grid md:grid-cols-2 gap-8">
-            {technicalSkills.map((skill, index) => (
-              <div
-                key={index}
-                data-skill-bar
-                data-skill-level={skill.level}
-                className="space-y-2"
-              >
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium text-foreground">{skill.name}</h4>
-                  <span className="text-sm text-accent font-semibold">{skill.level}</span>
+        <div className="grid md:grid-cols-2 gap-12 mb-16">
+          {/* Skill bars */}
+          <div data-animate-item>
+            <h3
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 700,
+                fontSize: '18px',
+                color: '#e2e8f0',
+                marginBottom: '24px',
+              }}
+            >
+              Poziom biegłości
+            </h3>
+            <div className="space-y-5">
+              {skillBars.map((skill, i) => (
+                <div key={i} data-skill-bar data-level={skill.level}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span
+                      style={{
+                        fontFamily: 'Poppins, sans-serif',
+                        fontSize: '13px',
+                        color: '#94a3b8',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {skill.name}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: 'Montserrat, sans-serif',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: '#7c3aed',
+                      }}
+                    >
+                      {skill.level}%
+                    </span>
+                  </div>
+                  <div className="skill-bar">
+                    <div className="skill-bar-fill" />
+                  </div>
                 </div>
-                <div className="skill-bar">
-                  <div className="skill-bar-fill"></div>
+              ))}
+            </div>
+          </div>
+
+          {/* Philosophy / Highlights */}
+          <div data-animate-item className="space-y-4">
+            <h3
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 700,
+                fontSize: '18px',
+                color: '#e2e8f0',
+                marginBottom: '24px',
+              }}
+            >
+              Wyróżniki
+            </h3>
+            {[
+              {
+                icon: '🎯',
+                title: 'MCP Protocol Author',
+                desc: '44 narzędzia własnego serwera MCP — jedyny taki projekt w Polsce.',
+                color: '#7c3aed',
+              },
+              {
+                icon: '⚡',
+                title: 'Multi-LLM Routing',
+                desc: 'Inteligentny routing ECO/SMART/DEEP przez 8 dostawców AI.',
+                color: '#06b6d4',
+              },
+              {
+                icon: '🔍',
+                title: 'RAG & Semantic Search',
+                desc: 'pgvector + embeddings + quality monitoring w produkcji.',
+                color: '#f59e0b',
+              },
+              {
+                icon: '🏗️',
+                title: 'Production GCP',
+                desc: 'Cloud Run, Compute Engine, Cloud SQL — live 24/7.',
+                color: '#10b981',
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="glass-card p-4 flex gap-3 items-start"
+                style={{ borderColor: `${item.color}22` }}
+              >
+                <span className="text-xl flex-shrink-0">{item.icon}</span>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontWeight: 700,
+                      fontSize: '13px',
+                      color: item.color,
+                      marginBottom: '3px',
+                    }}
+                  >
+                    {item.title}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '12px',
+                      color: '#64748b',
+                    }}
+                  >
+                    {item.desc}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Technologies and Tools */}
-        <div className="pt-12 border-t border-border">
-          <h3 className="text-2xl font-semibold text-foreground mb-8">Technologies & Tools</h3>
-          <div className="flex flex-wrap gap-3">
-            {technologies.map((tech, index) => (
+        {/* Tech pill groups */}
+        <div className="space-y-8">
+          {skillGroups.map((group, gi) => (
+            <div key={gi} data-animate-item>
               <div
-                key={index}
-                data-tech-badge
-                className="px-4 py-3 bg-secondary rounded-full text-sm text-foreground font-medium hover:bg-accent hover:text-white transition-all duration-300 cursor-pointer border border-border hover:border-accent shadow-sm hover:shadow-md"
+                style={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  color: '#64748b',
+                  textTransform: 'uppercase',
+                  letterSpacing: '2px',
+                  fontFamily: 'Poppins, sans-serif',
+                  marginBottom: '10px',
+                }}
               >
-                {tech}
+                {group.label}
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Non-Technical Skills */}
-        <div className="mt-16 pt-12 border-t border-border">
-          <h3 className="text-2xl font-semibold text-foreground mb-8">Additional Strengths</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            {['Creativity', 'Precision and Accuracy', 'Adaptive Resilience'].map((strength, index) => (
-              <div
-                key={index}
-                data-tech-badge
-                className="p-4 bg-secondary/50 rounded-lg border border-border hover:border-accent transition-all duration-300 cursor-pointer text-foreground font-medium"
-              >
-                ✨ {strength}
+              <div className="flex flex-wrap gap-2">
+                {group.pills.map((pill, pi) => (
+                  <span key={pi} className={`tech-pill ${group.color}`}>
+                    {pill}
+                  </span>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

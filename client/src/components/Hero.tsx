@@ -1,176 +1,410 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
 /**
- * Design Philosophy: Modern Minimalist with Fluid Motion + Enhanced Interactivity
- * - Large display typography with animated reveal
- * - Smooth parallax scrolling on hero section
- * - Floating animated background elements
- * - Character-by-character text reveal animation
- * - Multiple animation layers for depth
+ * Dark Glassmorphism Hero
+ * - Canvas floating particles
+ * - Typing animation for role
+ * - Stat cards with glass effect
+ * - Glow CTA buttons
  */
 
+const TYPING_STRINGS = [
+  'AI Software Engineer',
+  'Python Backend Developer',
+  'LLM Systems Architect',
+  'RAG & pgvector Expert',
+  'GCP Cloud Builder',
+];
+
 export default function Hero() {
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const ctaRef = useRef<HTMLButtonElement>(null);
-  const bgRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [typedText, setTypedText] = useState('');
+  const [stringIndex, setStringIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  // Typing animation
   useEffect(() => {
-    const timeline = gsap.timeline();
+    const current = TYPING_STRINGS[stringIndex];
+    const speed = isDeleting ? 40 : 80;
 
-    // Animate background elements
-    if (bgRef.current) {
-      const floatingElements = bgRef.current.querySelectorAll('[data-float]');
-      floatingElements.forEach((el, index) => {
-        gsap.to(el, {
-          y: -30,
-          opacity: 0.6,
-          duration: 3 + index * 0.5,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
+    const timer = setTimeout(() => {
+      if (!isDeleting) {
+        setTypedText(current.slice(0, charIndex + 1));
+        if (charIndex + 1 === current.length) {
+          setTimeout(() => setIsDeleting(true), 1800);
+        } else {
+          setCharIndex((c) => c + 1);
+        }
+      } else {
+        setTypedText(current.slice(0, charIndex - 1));
+        if (charIndex - 1 === 0) {
+          setIsDeleting(false);
+          setStringIndex((i) => (i + 1) % TYPING_STRINGS.length);
+          setCharIndex(0);
+        } else {
+          setCharIndex((c) => c - 1);
+        }
+      }
+    }, speed);
+
+    return () => clearTimeout(timer);
+  }, [charIndex, isDeleting, stringIndex]);
+
+  // Canvas particles
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const particles: Array<{
+      x: number; y: number; vx: number; vy: number;
+      r: number; opacity: number; color: string;
+    }> = [];
+
+    const colors = ['#7c3aed', '#06b6d4', '#f59e0b', '#a78bfa'];
+
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 0.5,
+        opacity: Math.random() * 0.5 + 0.1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.opacity;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+
+      // Draw connections
+      particles.forEach((p1, i) => {
+        particles.slice(i + 1).forEach((p2) => {
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = '#7c3aed';
+            ctx.globalAlpha = (1 - dist / 120) * 0.15;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
         });
       });
-    }
 
-    // Animate title with character reveal effect
-    if (titleRef.current) {
-      const titleText = titleRef.current.textContent || '';
-      titleRef.current.innerHTML = titleText
-        .split('')
-        .map((char) => `<span class="inline-block">${char}</span>`)
-        .join('');
+      animId = requestAnimationFrame(draw);
+    };
 
-      timeline.fromTo(
-        titleRef.current.querySelectorAll('span'),
-        { opacity: 0, y: 30, rotateX: -90 },
-        {
-          opacity: 1,
-          y: 0,
-          rotateX: 0,
-          duration: 0.08,
-          stagger: 0.03,
-          ease: 'back.out',
-        },
-        0
-      );
-    }
+    draw();
 
-    // Animate subtitle
-    if (subtitleRef.current) {
-      timeline.fromTo(
-        subtitleRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.8, ease: 'cubic.out' },
-        0.4
-      );
-    }
-
-    // Animate CTA button with glow effect
-    if (ctaRef.current) {
-      timeline.fromTo(
-        ctaRef.current,
-        { opacity: 0, y: 30, scale: 0.8 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'cubic.out' },
-        0.6
-      );
-
-      // Continuous glow animation
-      gsap.to(ctaRef.current, {
-        boxShadow: '0 0 20px rgba(20, 184, 166, 0.5), 0 0 40px rgba(20, 184, 166, 0.2)',
-        duration: 2,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
-
-      // Hover animation
-      ctaRef.current.addEventListener('mouseenter', () => {
-        gsap.to(ctaRef.current, {
-          scale: 1.1,
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-      });
-
-      ctaRef.current.addEventListener('mouseleave', () => {
-        gsap.to(ctaRef.current, {
-          scale: 1,
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-      });
-    }
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', resize);
+    };
   }, []);
 
+  // GSAP entrance animations
+  useEffect(() => {
+    if (!heroRef.current) return;
+    const tl = gsap.timeline({ delay: 0.2 });
+
+    tl.fromTo(
+      heroRef.current.querySelectorAll('[data-hero-item]'),
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out' }
+    );
+  }, []);
+
+  const stats = [
+    { value: '8+', label: 'LLM Providers' },
+    { value: '44', label: 'MCP Tools' },
+    { value: '776', label: 'Vector Docs' },
+    { value: '100%', label: 'Solo Built' },
+  ];
+
   return (
-    <section className="min-h-screen flex items-center justify-center pt-20 pb-20 relative overflow-hidden">
-      {/* Animated background gradient */}
-      <div ref={bgRef} className="absolute inset-0 -z-10">
-        <div
-          data-float
-          className="absolute top-20 right-20 w-96 h-96 bg-accent/10 rounded-full blur-3xl"
-        ></div>
-        <div
-          data-float
-          className="absolute bottom-20 left-20 w-96 h-96 bg-accent/5 rounded-full blur-3xl"
-        ></div>
-        <div
-          data-float
-          className="absolute top-1/2 left-1/3 w-72 h-72 bg-accent/8 rounded-full blur-3xl"
-        ></div>
-      </div>
+    <section
+      id="hero"
+      className="min-h-screen flex items-center justify-center pt-24 pb-16 relative overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #0d0d1a 100%)' }}
+    >
+      {/* Canvas particles */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 0 }}
+      />
 
-      {/* Animated grid background */}
-      <div className="absolute inset-0 -z-10 opacity-5">
+      {/* Radial glow backgrounds */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 0 }}
+      >
         <div
-          className="absolute inset-0"
+          className="absolute"
           style={{
-            backgroundImage: 'linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px)',
-            backgroundSize: '50px 50px',
+            top: '10%',
+            left: '5%',
+            width: '500px',
+            height: '500px',
+            background: 'radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, transparent 70%)',
+            borderRadius: '50%',
           }}
-        ></div>
+        />
+        <div
+          className="absolute"
+          style={{
+            bottom: '10%',
+            right: '5%',
+            width: '400px',
+            height: '400px',
+            background: 'radial-gradient(circle, rgba(6, 182, 212, 0.10) 0%, transparent 70%)',
+            borderRadius: '50%',
+          }}
+        />
+        <div
+          className="absolute"
+          style={{
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '600px',
+            height: '600px',
+            background: 'radial-gradient(circle, rgba(245, 158, 11, 0.04) 0%, transparent 70%)',
+            borderRadius: '50%',
+          }}
+        />
       </div>
 
-      <div className="container max-w-4xl relative z-10">
+      <div className="container max-w-5xl relative" style={{ zIndex: 1 }} ref={heroRef}>
+        {/* Label */}
+        <div data-hero-item className="section-label mb-4">
+          AI Systems Developer — Łódź, Polska
+        </div>
+
+        {/* Name */}
         <h1
-          ref={titleRef}
-          className="text-6xl md:text-7xl lg:text-8xl font-bold text-foreground mb-6 leading-tight"
-          style={{ letterSpacing: '-0.02em', perspective: '1000px' }}
+          data-hero-item
+          style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 900,
+            fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+            lineHeight: 1.05,
+            letterSpacing: '-0.02em',
+            color: '#f0f0ff',
+            marginBottom: '8px',
+          }}
         >
-          Excel Sean
+          WOJCIECH
+        </h1>
+        <h1
+          data-hero-item
+          className="gradient-text"
+          style={{
+            fontFamily: 'Montserrat, sans-serif',
+            fontWeight: 900,
+            fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+            lineHeight: 1.05,
+            letterSpacing: '-0.02em',
+            marginBottom: '24px',
+          }}
+        >
+          KOWALCZYK
         </h1>
 
-        <p
-          ref={subtitleRef}
-          className="text-xl md:text-2xl text-muted-foreground mb-8 font-light max-w-2xl"
-          style={{ letterSpacing: '0.01em' }}
+        {/* Typing animation */}
+        <div
+          data-hero-item
+          className="flex items-center gap-3 mb-6"
+          style={{ minHeight: '40px' }}
         >
-          Results-driven professional with proven leadership strength, driving progress through proactive initiatives and delivering dependable results.
+          <span
+            style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+              fontWeight: 500,
+              color: '#06b6d4',
+            }}
+          >
+            {typedText}
+          </span>
+          <span
+            style={{
+              width: '2px',
+              height: '1.4rem',
+              background: '#7c3aed',
+              display: 'inline-block',
+              animation: 'typing-cursor 1s infinite',
+            }}
+          />
+        </div>
+
+        {/* Description */}
+        <p
+          data-hero-item
+          style={{
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: '15px',
+            color: '#94a3b8',
+            lineHeight: 1.8,
+            maxWidth: '600px',
+            marginBottom: '32px',
+          }}
+        >
+          Samodzielnie zbudowałem{' '}
+          <span style={{ color: '#a78bfa', fontWeight: 600 }}>NEXUS</span> — kompletny
+          ekosystem AI z 8 dostawcami LLM, RAG (pgvector), multi-agent runtime i
+          infrastrukturą produkcyjną na{' '}
+          <span style={{ color: '#06b6d4', fontWeight: 600 }}>GCP + Cloudflare</span>.
+          Autor własnego serwera MCP z{' '}
+          <span style={{ color: '#f59e0b', fontWeight: 600 }}>44 narzędziami</span>.
         </p>
 
-        <button
-          ref={ctaRef}
-          className="px-8 py-4 bg-accent text-white rounded-lg font-medium hover:shadow-xl transition-all duration-300 inline-block"
+        {/* Contact pills */}
+        <div data-hero-item className="flex flex-wrap gap-2 mb-8">
+          {[
+            { icon: '✉', text: 'wojciech.kowalczyk11to@gmail.com', href: 'mailto:wojciech.kowalczyk11to@gmail.com' },
+            { icon: '🌐', text: 'portfolio.nexus-oc.pl', href: 'https://portfolio.nexus-oc.pl' },
+            { icon: '💻', text: 'github.com/wojciechkowalczyk11to-tech', href: 'https://github.com/wojciechkowalczyk11to-tech' },
+            { icon: '📍', text: 'Łódź, Polska', href: null },
+          ].map((item, i) => (
+            item.href ? (
+              <a
+                key={i}
+                href={item.href}
+                target={item.href.startsWith('http') ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                style={{
+                  padding: '6px 14px',
+                  border: '1px solid rgba(124, 58, 237, 0.2)',
+                  borderRadius: '20px',
+                  fontSize: '11px',
+                  color: '#94a3b8',
+                  background: 'rgba(124, 58, 237, 0.06)',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease',
+                  fontFamily: 'Poppins, sans-serif',
+                }}
+                onMouseEnter={(e) => {
+                  (e.target as HTMLElement).style.borderColor = 'rgba(124, 58, 237, 0.5)';
+                  (e.target as HTMLElement).style.color = '#a78bfa';
+                }}
+                onMouseLeave={(e) => {
+                  (e.target as HTMLElement).style.borderColor = 'rgba(124, 58, 237, 0.2)';
+                  (e.target as HTMLElement).style.color = '#94a3b8';
+                }}
+              >
+                {item.icon} {item.text}
+              </a>
+            ) : (
+              <span
+                key={i}
+                style={{
+                  padding: '6px 14px',
+                  border: '1px solid rgba(124, 58, 237, 0.2)',
+                  borderRadius: '20px',
+                  fontSize: '11px',
+                  color: '#94a3b8',
+                  background: 'rgba(124, 58, 237, 0.06)',
+                  fontFamily: 'Poppins, sans-serif',
+                }}
+              >
+                {item.icon} {item.text}
+              </span>
+            )
+          ))}
+        </div>
+
+        {/* CTA Buttons */}
+        <div data-hero-item className="flex flex-wrap gap-4 mb-16">
+          <button
+            className="btn-glow animate-glow-pulse"
+            onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            Zobacz projekty
+          </button>
+          <a
+            href="mailto:wojciech.kowalczyk11to@gmail.com"
+            className="btn-outline-glow"
+          >
+            Skontaktuj się
+          </a>
+          <a
+            href="https://github.com/wojciechkowalczyk11to-tech"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline-glow"
+            style={{ borderColor: 'rgba(6, 182, 212, 0.4)', color: '#67e8f9' }}
+          >
+            GitHub →
+          </a>
+        </div>
+
+        {/* Stats */}
+        <div
+          data-hero-item
+          className="grid grid-cols-2 md:grid-cols-4 gap-3"
         >
-          Explore My Journey
-        </button>
+          {stats.map((stat, i) => (
+            <div key={i} className="stat-card">
+              <div className="stat-value">{stat.value}</div>
+              <div className="stat-label">{stat.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Scroll indicator with animation */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <svg
-          className="w-6 h-6 text-accent"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-        </svg>
+      {/* Scroll indicator */}
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        style={{ zIndex: 1 }}
+      >
+        <span style={{ fontSize: '10px', color: '#64748b', letterSpacing: '3px', fontFamily: 'Poppins, sans-serif' }}>
+          SCROLL
+        </span>
+        <div
+          style={{
+            width: '1px',
+            height: '40px',
+            background: 'linear-gradient(180deg, #7c3aed, transparent)',
+            animation: 'float-particle 2s ease-in-out infinite',
+          }}
+        />
       </div>
     </section>
   );

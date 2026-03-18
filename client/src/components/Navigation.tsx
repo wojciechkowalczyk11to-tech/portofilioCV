@@ -1,29 +1,33 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
 /**
- * Design Philosophy: Modern Minimalist with Fluid Motion + Enhanced Interactivity
- * - Floating navigation that transforms on scroll
- * - Smooth hover effects with animated underlines
- * - Animated logo and menu items
- * - Glassmorphic effect on scroll
+ * Dark Glassmorphism Navigation
+ * - Frosted glass on scroll
+ * - Gold accent logo
+ * - Smooth hover underlines
+ * - Mobile hamburger menu
  */
 
 export default function Navigation() {
   const navRef = useRef<HTMLElement>(null);
   const isScrolled = useRef(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrolled = window.scrollY > 50;
-
+      const scrolled = window.scrollY > 60;
       if (scrolled !== isScrolled.current && navRef.current) {
         isScrolled.current = scrolled;
         gsap.to(navRef.current, {
-          backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0)',
-          backdropFilter: scrolled ? 'blur(10px)' : 'blur(0px)',
-          boxShadow: scrolled ? '0 4px 12px rgba(0, 0, 0, 0.08)' : '0 0px 0px rgba(0, 0, 0, 0)',
-          duration: 0.3,
+          backgroundColor: scrolled
+            ? 'rgba(10, 10, 15, 0.85)'
+            : 'rgba(10, 10, 15, 0)',
+          backdropFilter: scrolled ? 'blur(20px)' : 'blur(0px)',
+          borderBottomColor: scrolled
+            ? 'rgba(30, 30, 46, 0.8)'
+            : 'rgba(30, 30, 46, 0)',
+          duration: 0.4,
           ease: 'power2.out',
         });
       }
@@ -34,6 +38,7 @@ export default function Navigation() {
   }, []);
 
   const scrollToSection = (id: string) => {
+    setMobileOpen(false);
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -41,35 +46,45 @@ export default function Navigation() {
   };
 
   const navItems = [
-    { label: 'About', id: 'about' },
-    { label: 'Experience', id: 'experience' },
-    { label: 'Skills', id: 'skills' },
-    { label: 'Achievements', id: 'achievements' },
-    { label: 'Projects', id: 'projects' },
-    { label: 'Contact', id: 'contact' },
+    { label: 'O mnie', id: 'about' },
+    { label: 'Projekty', id: 'projects' },
+    { label: 'Umiejętności', id: 'skills' },
+    { label: 'Doświadczenie', id: 'experience' },
+    { label: 'Kontakt', id: 'contact' },
   ];
 
   return (
     <nav
       ref={navRef}
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-      style={{
-        backgroundColor: 'rgba(255, 255, 255, 0)',
-        backdropFilter: 'blur(0px)',
-      }}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent"
+      style={{ backgroundColor: 'rgba(10, 10, 15, 0)' }}
     >
-      <div className="container flex items-center justify-between py-6">
+      <div className="container flex items-center justify-between py-5">
         {/* Logo */}
         <button
           onClick={() => scrollToSection('hero')}
-          className="flex items-center gap-2 group cursor-pointer"
+          className="flex items-center gap-3 group cursor-pointer"
         >
-          <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <span className="text-white font-bold text-lg">ES</span>
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
+            style={{
+              background: 'linear-gradient(135deg, #7c3aed, #06b6d4)',
+              boxShadow: '0 0 20px rgba(124, 58, 237, 0.4)',
+            }}
+          >
+            WK
           </div>
-          <span className="text-lg font-bold text-foreground group-hover:text-accent transition-colors duration-300">
-            Excel Sean
-          </span>
+          <div>
+            <span
+              className="text-base font-bold block leading-tight"
+              style={{ fontFamily: 'Montserrat, sans-serif', color: '#e2e8f0' }}
+            >
+              Wojciech Kowalczyk
+            </span>
+            <span className="text-xs" style={{ color: '#f59e0b', fontFamily: 'Poppins, sans-serif' }}>
+              AI Software Engineer
+            </span>
+          </div>
         </button>
 
         {/* Desktop Navigation */}
@@ -78,37 +93,83 @@ export default function Navigation() {
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
-              className="nav-link text-sm font-medium relative group"
+              className="nav-link"
             >
               {item.label}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"></span>
             </button>
           ))}
         </div>
 
         {/* CTA Button */}
-        <button className="hidden md:block px-6 py-2 bg-accent text-white rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-105 text-sm font-medium group">
-          <span className="group-hover:inline hidden">📧 </span>
-          Get In Touch
-        </button>
+        <a
+          href="mailto:wojciech.kowalczyk11to@gmail.com"
+          className="hidden md:flex btn-glow items-center gap-2 text-sm"
+          style={{ padding: '10px 20px' }}
+        >
+          <span>Kontakt</span>
+        </a>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-secondary transition-colors duration-300">
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
+        <button
+          className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg transition-colors duration-300"
+          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Menu"
+        >
+          <div className="space-y-1.5">
+            <span
+              className="block w-5 h-0.5 transition-all duration-300"
+              style={{
+                background: '#e2e8f0',
+                transform: mobileOpen ? 'rotate(45deg) translate(4px, 4px)' : 'none',
+              }}
             />
-          </svg>
+            <span
+              className="block w-5 h-0.5 transition-all duration-300"
+              style={{
+                background: '#e2e8f0',
+                opacity: mobileOpen ? 0 : 1,
+              }}
+            />
+            <span
+              className="block w-5 h-0.5 transition-all duration-300"
+              style={{
+                background: '#e2e8f0',
+                transform: mobileOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none',
+              }}
+            />
+          </div>
         </button>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileOpen && (
+        <div
+          className="md:hidden px-4 pb-6 pt-2"
+          style={{
+            background: 'rgba(10, 10, 15, 0.95)',
+            backdropFilter: 'blur(20px)',
+            borderTop: '1px solid rgba(30, 30, 46, 0.8)',
+          }}
+        >
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => scrollToSection(item.id)}
+              className="block w-full text-left py-3 nav-link border-b"
+              style={{ borderColor: 'rgba(30, 30, 46, 0.5)' }}
+            >
+              {item.label}
+            </button>
+          ))}
+          <a
+            href="mailto:wojciech.kowalczyk11to@gmail.com"
+            className="btn-glow mt-4 text-center block"
+          >
+            Napisz do mnie
+          </a>
+        </div>
+      )}
     </nav>
   );
 }

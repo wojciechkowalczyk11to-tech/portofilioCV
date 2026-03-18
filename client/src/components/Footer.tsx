@@ -1,163 +1,185 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-
 /**
- * Design Philosophy: Modern Minimalist with Fluid Motion + Enhanced Interactivity
- * - Animated footer with scroll reveals
- * - Interactive navigation links
- * - Smooth transitions and hover effects
+ * Dark Glassmorphism Footer
  */
 
 export default function Footer() {
-  const footerRef = useRef<HTMLDivElement>(null);
+  const year = new Date().getFullYear();
 
-  useEffect(() => {
-    if (!footerRef.current) return;
-
-    gsap.fromTo(
-      footerRef.current,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        duration: 0.8,
-        ease: 'cubic.out',
-        scrollTrigger: {
-          trigger: footerRef.current,
-          start: 'top 90%',
-        },
-      }
-    );
-
-    // Animate footer links on hover
-    const links = footerRef.current.querySelectorAll('[data-footer-link]');
-    links.forEach((link) => {
-      link.addEventListener('mouseenter', () => {
-        gsap.to(link, {
-          x: 5,
-          color: '#14b8a6',
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-      });
-
-      link.addEventListener('mouseleave', () => {
-        gsap.to(link, {
-          x: 0,
-          color: 'inherit',
-          duration: 0.3,
-          ease: 'cubic.out',
-        });
-      });
-    });
-  }, []);
-
-  const currentYear = new Date().getFullYear();
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <footer
-      ref={footerRef}
-      className="bg-foreground/5 border-t border-border py-12 relative overflow-hidden"
+      style={{
+        background: '#080810',
+        borderTop: '1px solid rgba(30, 30, 46, 0.8)',
+        padding: '40px 0 24px',
+      }}
     >
-      {/* Subtle background animation */}
-      <div className="absolute inset-0 -z-10 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px)',
-            backgroundSize: '50px 50px',
-          }}
-        ></div>
-      </div>
-
-      <div className="container max-w-5xl relative z-10">
+      <div className="container max-w-5xl">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Navigation</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#about" data-footer-link className="nav-link text-sm">
-                  About
-                </a>
-              </li>
-              <li>
-                <a href="#experience" data-footer-link className="nav-link text-sm">
-                  Experience
-                </a>
-              </li>
-              <li>
-                <a href="#skills" data-footer-link className="nav-link text-sm">
-                  Skills
-                </a>
-              </li>
-              <li>
-                <a href="#achievements" data-footer-link className="nav-link text-sm">
-                  Achievements
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Connect</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="mailto:excelsean777@gmail.com" data-footer-link className="nav-link text-sm">
-                  Email
-                </a>
-              </li>
-              <li>
-                <a href="#" data-footer-link className="nav-link text-sm">
-                  LinkedIn
-                </a>
-              </li>
-              <li>
-                <a href="#" data-footer-link className="nav-link text-sm">
-                  GitHub
-                </a>
-              </li>
-              <li>
-                <a href="#" data-footer-link className="nav-link text-sm">
-                  Twitter
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">Resources</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" data-footer-link className="nav-link text-sm">
-                  Resume
-                </a>
-              </li>
-              <li>
-                <a href="#" data-footer-link className="nav-link text-sm">
-                  Portfolio
-                </a>
-              </li>
-              <li>
-                <a href="#contact" data-footer-link className="nav-link text-sm">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-foreground mb-4">About</h3>
-            <p className="text-muted-foreground text-sm">
-              Excel Sean - Results-driven professional with proven leadership strength and commitment to excellence.
+          {/* Brand */}
+          <div className="md:col-span-2">
+            <div
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 800,
+                fontSize: '18px',
+                color: '#e2e8f0',
+                marginBottom: '8px',
+              }}
+            >
+              Wojciech Kowalczyk
+            </div>
+            <div
+              style={{
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '12px',
+                color: '#f59e0b',
+                marginBottom: '12px',
+                fontWeight: 600,
+              }}
+            >
+              AI Software Engineer
+            </div>
+            <p
+              style={{
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: '12px',
+                color: '#475569',
+                lineHeight: 1.7,
+                maxWidth: '280px',
+              }}
+            >
+              Twórca NEXUS — ekosystemu AI z 8 LLM, RAG, 44 narzędziami MCP i
+              infrastrukturą produkcyjną GCP + Cloudflare.
             </p>
+          </div>
+
+          {/* Navigation */}
+          <div>
+            <h4
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 700,
+                fontSize: '13px',
+                color: '#94a3b8',
+                marginBottom: '16px',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+              }}
+            >
+              Nawigacja
+            </h4>
+            <ul className="space-y-2">
+              {[
+                { label: 'O mnie', id: 'about' },
+                { label: 'Projekty', id: 'projects' },
+                { label: 'Umiejętności', id: 'skills' },
+                { label: 'Doświadczenie', id: 'experience' },
+                { label: 'Kontakt', id: 'contact' },
+              ].map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => scrollTo(item.id)}
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '13px',
+                      color: '#475569',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={(e) => ((e.target as HTMLElement).style.color = '#a78bfa')}
+                    onMouseLeave={(e) => ((e.target as HTMLElement).style.color = '#475569')}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Links */}
+          <div>
+            <h4
+              style={{
+                fontFamily: 'Montserrat, sans-serif',
+                fontWeight: 700,
+                fontSize: '13px',
+                color: '#94a3b8',
+                marginBottom: '16px',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+              }}
+            >
+              Linki
+            </h4>
+            <ul className="space-y-2">
+              {[
+                { label: 'GitHub', href: 'https://github.com/wojciechkowalczyk11to-tech' },
+                { label: 'N.O.C Live', href: 'https://nexus-backend-r56g4gr2da-uc.a.run.app' },
+                { label: 'MCP Server', href: 'https://mcp.nexus-oc.pl' },
+                { label: 'Gangus AI', href: 'https://wojciechkowalczyk11to-tech.github.io/gangus-ai-landing/' },
+                { label: 'Portfolio', href: 'https://portfolio.nexus-oc.pl' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '13px',
+                      color: '#475569',
+                      textDecoration: 'none',
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={(e) => ((e.target as HTMLElement).style.color = '#67e8f9')}
+                    onMouseLeave={(e) => ((e.target as HTMLElement).style.color = '#475569')}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-muted-foreground text-sm">
-            © {currentYear} Excel Sean. All rights reserved.
+        {/* Bottom bar */}
+        <div
+          style={{
+            borderTop: '1px solid rgba(30, 30, 46, 0.6)',
+            paddingTop: '20px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '12px',
+              color: '#334155',
+            }}
+          >
+            © {year} Wojciech Kowalczyk. Wszelkie prawa zastrzeżone.
           </p>
-          <p className="text-muted-foreground text-sm mt-4 md:mt-0">
-            Designed & Built with <span className="text-accent">❤</span> using React, TypeScript & GSAP
+          <p
+            style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '12px',
+              color: '#334155',
+            }}
+          >
+            Zbudowane z{' '}
+            <span style={{ color: '#7c3aed' }}>♥</span>
+            {' '}React · TypeScript · GSAP · Dark Glassmorphism
           </p>
         </div>
       </div>
